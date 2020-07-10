@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<script src="vue.js"></script>
+<script src="jquery-3.3.1.js"></script>
+</head>
+
+<style type="text/css">
+	textarea{
+		width: 300px;
+		height: 200px;
+		float: right;
+		margin-left: 20px;
+	}
+	div{
+		float: left;
+		margin-left: 20px;
+	}
+	div h4{
+		margin: 0;
+	}
+	a{
+		display: block;
+		text-decoration: none;
+	}		
+</style>
+	</head>
+	<body>
+	
+	<div id = 'blocknote'>
+		<textarea v-on:keyup.enter = "addNewNote($event)"> </textarea>
+		<div id = 'notesList' v-on:click = "notesListClickHandler($event)">
+			<h4>Сохраненые записи</h4>
+		</div>
+	</div>
+<script>
+/*Реализуйте блокнотик, в который можно добавлять новые записи. 
+Записи появляются слева от блокнотика в виде ссылок с текстом в 
+виде даты-времени создания этой записи. Можно нажать на ссылку и 
+в блокноте появится текст за эту дату. Пусть сам блокнотик представляет 
+собой textarea, расположенный по центру страницы.
+*/
+console.log(JSON.parse(localStorage.getItem('blocknote')));
+let app = new Vue({
+		el:'#blocknote',
+		data: { 
+			//blocknote : {},
+			blocknote : JSON.parse(localStorage.getItem('blocknote')),
+		},
+		//beforeMount: Вызывается непосредственно перед началом монтажа:
+		//функция рендеринга будет вызвана в первый раз.
+		 beforeMount(){
+		 },
+		 //вызывается после того, как экземпляр только что был установлен, 
+		 //где el заменяется вновь созданным vm.$el.
+		  mounted(){
+			this.loadNotesFromStorage();
+			console.log(this.blocknote);
+		 },
+		methods: {
+			loadNotesFromStorage : function(){
+				for( let key in this.blocknote)
+				{
+					$('#notesList').append('<a href="#">' + key + '</a>');
+				}
+			},
+			
+			addZero : function (str)
+			{
+				str = String(str);
+				if(str.length == 1)
+					return '0' + str;
+				else
+					return str;
+			},
+			
+			addNewNote : function(event){
+
+					var d = new Date;
+					var dayY = d.getFullYear();
+					var dayM = d.getMonth()+1;
+					var dayD = d.getDate();
+					var dayH = d.getHours();
+					var dayMn = d.getMinutes();
+					var dayS = d.getSeconds();
+					var dateD = dayY + '.' + this.addZero(dayM) + '.' + this.addZero(dayD) + '-' + 
+								this.addZero(dayH) + ':' + this.addZero(dayMn) + ':' + this.addZero(dayS);
+					var dateVal = $('textarea').val();
+					$('textarea').val('');
+					$('#notesList').append('<a href="#">' + dateD +'</a>');
+					
+					this.blocknote[dateD] = dateVal;
+					console.log()
+					localStorage.setItem('blocknote', JSON.stringify(this.blocknote));
+			},
+			
+			notesListClickHandler : function(event){
+
+				if (event.target.tagName !== 'A') return;
+				
+				$('textarea').val('');
+				$('textarea').val(this.blocknote[$(event.target).html()]);
+			}
+			
+			
+			},
+		filters:{
+		},
+		computed:{
+		},
+	}); 
+
+</script>
+</body>
+</html>
+	
+	
+	
+	
+												
+		
